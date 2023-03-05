@@ -153,15 +153,19 @@ def get_all_my_tweets(token: dict) -> list:
     response = requests.get(
         url=url, params=query_params, headers={"Authorization": "Bearer {}".format(token["access_token"])}
     )
-    data = response.json()
-    all_results.extend([t["text"] for t in data["data"]])
-    while "next_token" in data["meta"]:
-        query_params = {"max_results": 100, "pagination_token": data["meta"]["next_token"]}
+    response_j = response.json()
+    if response_j["meta"]["result_count"] > 0:
+        # Check that there is tweet information
+        all_results.extend([t["text"] for t in response_j["data"]])
+    while "next_token" in response_j["meta"]:
+        query_params = {"max_results": 100, "pagination_token": response_j["meta"]["next_token"]}
         response = requests.get(
             url=url, params=query_params, headers={"Authorization": "Bearer {}".format(token["access_token"])}
         )
-        data = response.json()
-        all_results.append(t["text"] for t in data)
+        response_j = response.json()
+        if response_j["meta"]["result_count"] > 0:
+            # Check that there is tweet information
+            all_results.extend([t["text"] for t in response_j["data"]])
 
     return all_results
 
