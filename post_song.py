@@ -171,18 +171,8 @@ def get_all_my_tweets(token: dict) -> list:
 
 
 def update_twitter_token(token: str) -> None:
-    file_contents = '''import modal
-
-stub = modal.Stub("twitter-token")
-stub["twitter-token"] = modal.Secret({"TWITTER_TOKEN":"'''
-    file_contents += token + '"})'
-
-    print(f"{file_contents=}")
-
-    with open("update_token.py", "w") as f:
-        f.write(file_contents)
-
-    os.system("modal deploy update_token.py")
+    keyvalue = f'TWITTER_TOKEN="{token}"'
+    os.system(f"modal secret create twitter-token {keyvalue}")
 
 
 @stub.function(
